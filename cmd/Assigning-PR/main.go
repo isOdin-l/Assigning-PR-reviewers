@@ -8,10 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/isOdin-l/Assigning-PR-reviewers/configs"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/database/postgres"
+	"github.com/isOdin-l/Assigning-PR-reviewers/internal/handler"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/httpchi"
+	"github.com/isOdin-l/Assigning-PR-reviewers/internal/repository"
+	"github.com/isOdin-l/Assigning-PR-reviewers/internal/service"
 )
 
 func main() {
@@ -28,22 +30,21 @@ func main() {
 	if err != nil {
 		slog.Error(fmt.Sprintf("Error while conneciton to database: %v", err.Error()))
 	}
-	_ = db
 
-	// // repository
-	// repository := repository.NewRepo(db)
+	// repository
+	repository := repository.NewRepository(db)
 
-	// // service
-	// service := service.NewService(repository)
+	// service
+	service := service.NewService(repository)
 
-	// // handler
-	// handler := handler.NewHandler(service)
+	// handler
+	handler := handler.NewHandler(service)
 
-	// // router
-	// router := httpchi.NewRouter(handler)
+	// router
+	router := httpchi.NewRouter(handler)
 
 	// server
-	server := httpchi.NewServer("8080", chi.NewRouter())
+	server := httpchi.NewServer("8080", router)
 	go func() {
 		if err := server.RunServer(); err != nil {
 			slog.Error(fmt.Sprintf("Error while server is running: %v", err.Error()))

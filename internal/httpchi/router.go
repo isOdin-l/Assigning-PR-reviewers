@@ -43,8 +43,8 @@ func NewRouter(h HandlerInterface) chi.Router {
 		})
 
 		r.Route("/team", func(r chi.Router) {
-			r.Post("add", h.PostTeamAdd)
-			r.Get("get", h.GetTeamGet)
+			r.Post("/add", h.PostTeamAdd)
+			r.Get("/get", h.GetTeamGet)
 		})
 
 		r.Route("/users", func(r chi.Router) {
