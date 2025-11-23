@@ -8,9 +8,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type Database struct {
+	*pgxpool.Pool
+}
+
 func NewPostgresDB(ctx context.Context, cfg *configs.Config) (*pgxpool.Pool, error) {
-	conectionString := cfg.DSN()
-	conn, err := pgxpool.New(ctx, conectionString)
+	conn, err := pgxpool.New(ctx, cfg.DSN())
 	if err != nil {
 		return nil, err
 	}

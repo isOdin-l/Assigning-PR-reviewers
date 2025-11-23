@@ -10,9 +10,6 @@ import (
 )
 
 func DefaultBind[T any](r *http.Request, v *T) error {
-	// Создание декодера
-	decoder := form.NewDecoder()
-
 	// ----- Parse request Body -----
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil && err != io.EOF {
 		return err
@@ -26,5 +23,5 @@ func DefaultBind[T any](r *http.Request, v *T) error {
 		UrlParams[keys[i]] = []string{values[i]}
 	}
 
-	return decoder.Decode(v, UrlParams)
+	return form.NewDecoder().Decode(v, UrlParams)
 }

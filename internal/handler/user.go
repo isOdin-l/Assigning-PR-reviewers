@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	"github.com/isOdin-l/Assigning-PR-reviewers/gen/models"
+	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
+	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
 	"github.com/isOdin-l/Assigning-PR-reviewers/tool/chibind"
 )
 
 type UserServiceInterface interface {
-	GetUserIsReviewer(userInfo models.GetUsersGetReview) (models.ResponseUsersGetReview, error)
-	PostUserSetIsActive(userInfo models.PostUserSetIsActiveJSONBody) (models.User, models.ErrorResponse)
+	GetPRsWhereUserIsReviewer(userId string) (models.ResponsePRsWhereUserIsReviewer, error)
+	PostUserSetIsActive(user *models.PostUserSetIsActive) (*models.ResponseUser, *api.ErrorResponse)
 }
 
 type UserHandler struct {
@@ -24,40 +25,35 @@ func NewUserHandler(service UserServiceInterface) *UserHandler {
 }
 
 func (h *UserHandler) GetUsersGetReview(w http.ResponseWriter, r *http.Request) {
-	var user models.GetUsersGetReview
+	var user api.GetUsersGetReview
 	if err := chibind.DefaultBind(r, &user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error(fmt.Sprintf("Error in request data: %s", err.Error()))
 		return
 	}
 
-	response, err := h.service.GetUserIsReviewer(user)
+	response, err := h.service.GetPRsWhereUserIsReviewer(user.UserId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		slog.Error(fmt.Sprintf("Error in server process: %s", err.Error()))
 		return
 	}
 
-	render.JSON(w, r, map[string]any{
-		"user_id":       response.User_id,
-		"pull_requests": response.PullRequests,
-	})
+	render.JSON(w, r, response)
 }
 func (h *UserHandler) PostUserSetIsActive(w http.ResponseWriter, r *http.Request) {
-	var user models.PostUserSetIsActiveJSONBody
+	var user api.PostUserSetIsActive
 	if err := chibind.DefaultBind(r, &user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error(fmt.Sprintf("Error in request data: %s", err.Error()))
 		return
 	}
 
-	response, err := h.service.PostUserSetIsActive(user)
-	if err.Error.Code == models.NOTFOUND {
+	response, err := h.service.PostUserSetIsActive(models.ConvertToPostUserSetIsActive(user))
+	if err != nil && err.Error.Code == api.NOTFOUND {
 		http.Error(w, err.Error.Message, http.StatusNotFound)
 		return
 	}
 
-	render.JSON(w, r, map[string]models.User{
-		"user": response,
-	})
+	render.JSON(w, r, response)
 }
