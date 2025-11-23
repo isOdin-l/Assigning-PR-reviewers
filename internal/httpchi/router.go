@@ -14,7 +14,7 @@ type HandlerInterface interface {
 	PostTeamAdd(w http.ResponseWriter, r *http.Request)
 	GetTeamGet(w http.ResponseWriter, r *http.Request)
 	GetUsersGetReview(w http.ResponseWriter, r *http.Request)
-	PostUsersSetIsActive(w http.ResponseWriter, r *http.Request)
+	PostUserSetIsActive(w http.ResponseWriter, r *http.Request)
 }
 
 func NewRouter(h HandlerInterface) chi.Router {
@@ -44,12 +44,12 @@ func NewRouter(h HandlerInterface) chi.Router {
 
 		r.Route("/team", func(r chi.Router) {
 			r.Post("/add", h.PostTeamAdd)
-			r.Get("/get", h.GetTeamGet)
+			r.Get("/get/{team_name}", h.GetTeamGet)
 		})
 
 		r.Route("/users", func(r chi.Router) {
-			r.Post("/setIsActive", h.PostUsersSetIsActive)
-			r.Get("/getReview", h.GetUsersGetReview)
+			r.Post("/setIsActive", h.PostUserSetIsActive)
+			r.Get("/getReview/{user_id}", h.GetUsersGetReview)
 		})
 	})
 	return r
