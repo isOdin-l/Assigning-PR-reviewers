@@ -13,6 +13,8 @@ CREATE TABLE pull_requests(
     author_id UUID REFERENCES users(id) NOT NULL,
     name TEXT NOT NULL,
     status PR_STATUS DEFAULT 'OPEN' NOT NULL
+    -- created_at
+    -- merged_at
 );
 
 

@@ -14,7 +14,7 @@ import (
 
 type TeamServiceInterface interface {
 	PostTeamAdd(ctx context.Context, team *models.Team) (*models.Team, error)
-	GetTeam(ctx context.Context, team *models.GetTeamGetParams) (*models.Team, error)
+	GetTeam(ctx context.Context, team *models.GetTeamParams) (*models.Team, error)
 }
 
 type TeamHandler struct {
@@ -49,14 +49,14 @@ func (h *TeamHandler) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 
 }
 func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
-	var team api.GetTeamGetParams
+	var team api.GetTeamParams
 	if err := chibind.DefaultBind(r, &team); err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		slog.Error(fmt.Sprintf("Erorr while parsing data: %v", err.Error()))
 		return
 	}
 
-	response, err := h.service.GetTeam(r.Context(), models.ConvertToGetTeamGetParams(&team))
+	response, err := h.service.GetTeam(r.Context(), models.ConvertToGetTeamParams(&team))
 	// if err.Error.Code == models.NOTFOUND {
 	// 	http.Error(w, err.Error.Message, http.StatusNotFound)
 	// 	slog.Info(err.Error.Message)

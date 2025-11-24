@@ -1,6 +1,14 @@
 package models
 
-import "github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
+import (
+	"time"
+
+	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
+)
+
+// TODO: расположить коверторы по блокам, разделённым этими комментариями:
+// API => INTERNAL
+// API <= INTERNAL
 
 func convertToTeamMember(teamMembers []api.TeamMember) *[]TeamMember {
 	members := make([]TeamMember, len(teamMembers), cap(teamMembers))
@@ -44,8 +52,86 @@ func ConvertToUser(user *PostUserSetIsActive) *User {
 	}
 }
 
-func ConvertToGetTeamGetParams(team *api.GetTeamGetParams) *GetTeamGetParams {
-	return &GetTeamGetParams{
+func ConvertToGetTeamParams(team *api.GetTeamParams) *GetTeamParams {
+	return &GetTeamParams{
 		TeamName: team.TeamName,
+	}
+}
+
+func ConvertToPullRequestCreate(pullRequest *api.PullRequestCreate) *PullRequestCreate {
+	return &PullRequestCreate{
+		AuthorId:        pullRequest.AuthorId,
+		PullRequestId:   pullRequest.PullRequestId,
+		PullRequestName: pullRequest.PullRequestName,
+	}
+}
+
+func ConvertToPullRequestMerge(pullRequest *api.PullRequestMerge) *PullRequestMerge {
+	return &PullRequestMerge{
+		PullRequestId: pullRequest.PullRequestId,
+	}
+}
+
+func ConvertToPullRequestReassign(pullRequest *api.PullRequestReassign) *PullRequestReassign {
+	return &PullRequestReassign{
+		OldUserId:     pullRequest.OldUserId,
+		PullRequestId: pullRequest.PullRequestId,
+	}
+}
+
+func ConvertToApiPullRequestCreate(pullRequest PullRequest) *api.ResponsePullRequestCreate {
+	return &api.ResponsePullRequestCreate{
+		PR: struct {
+			PullRequestId     string                "json:\"pull_request_id\""
+			PullRequestName   string                "json:\"pull_request_name\""
+			AuthorId          string                "json:\"author_id\""
+			Status            api.PullRequestStatus "json:\"status\""
+			AssignedReviewers []string              "json:\"assigned_reviewers\""
+		}{
+			PullRequestId:     pullRequest.PullRequestId,
+			PullRequestName:   pullRequest.PullRequestName,
+			AuthorId:          pullRequest.AuthorId,
+			Status:            api.PullRequestStatus(pullRequest.Status),
+			AssignedReviewers: pullRequest.AssignedReviewers,
+		},
+	}
+}
+
+func ConvertToApiPullRequestMerge(pullRequest *PullRequest) *api.ResponsePullRequestMerge {
+	return &api.ResponsePullRequestMerge{
+		PR: struct {
+			PullRequestId     string                "json:\"pull_request_id\""
+			PullRequestName   string                "json:\"pull_request_name\""
+			AuthorId          string                "json:\"author_id\""
+			Status            api.PullRequestStatus "json:\"status\""
+			AssignedReviewers []string              "json:\"assigned_reviewers\""
+			MergedAt          *time.Time            "json:\"mergedAt\""
+		}{
+			PullRequestId:     pullRequest.PullRequestId,
+			PullRequestName:   pullRequest.PullRequestName,
+			AuthorId:          pullRequest.AuthorId,
+			Status:            api.PullRequestStatus(pullRequest.Status),
+			AssignedReviewers: pullRequest.AssignedReviewers,
+			MergedAt:          pullRequest.MergedAt,
+		},
+	}
+}
+
+func ConvertToApiPullRequestReassign(pullRequest *PullRequest, replacedByUserId string) *api.ResponsePullRequestReassign {
+	return &api.ResponsePullRequestReassign{
+		PR: struct {
+			PullRequestId     string                "json:\"pull_request_id\""
+			PullRequestName   string                "json:\"pull_request_name\""
+			AuthorId          string                "json:\"author_id\""
+			Status            api.PullRequestStatus "json:\"status\""
+			AssignedReviewers []string              "json:\"assigned_reviewers\""
+		}{
+			PullRequestId:     pullRequest.PullRequestId,
+			PullRequestName:   pullRequest.PullRequestName,
+			AuthorId:          pullRequest.AuthorId,
+			Status:            api.PullRequestStatus(pullRequest.Status),
+			AssignedReviewers: pullRequest.AssignedReviewers,
+		},
+		ReplacedByUserId: replacedByUserId,
 	}
 }

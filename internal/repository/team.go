@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/database"
@@ -19,24 +20,17 @@ func NewTeamRepo(db *pgxpool.Pool) *TeamRepo {
 	return &TeamRepo{db: db, psql: sq.StatementBuilder.PlaceholderFormat(sq.Dollar)}
 }
 
-func (r *TeamRepo) IsTeamExist(ctx context.Context, teamName string) (int, error) {
-	query, values, err := r.psql.
-		Select("COUNT(1)").
-		From(database.UsersTable).
-		Where(sq.Eq{"team_name": teamName}).ToSql()
-	if err != nil {
-		return -1, err
-	}
-	var isExist int
-	err = r.db.QueryRow(ctx, query, values...).Scan(&isExist)
-
-	return isExist, err
-}
-
 func (r *TeamRepo) CreateTeam(ctx context.Context, team *models.Team) error {
 	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
+	}
+
+	isExist, err := r.isTeamExist(ctx, tx, team.TeamName)
+	if err != nil {
+		return err
+	} else if isExist == 1 {
+		return errors.New("team already exists")
 	}
 
 	// Перебор всех мемберов
@@ -83,6 +77,20 @@ func (r *TeamRepo) GetTeam(ctx context.Context, teamName string) (*models.Team, 
 	}
 
 	return &models.Team{TeamName: teamName, Members: teamMembers}, nil
+}
+
+func (r *TeamRepo) isTeamExist(ctx context.Context, tx pgx.Tx, teamName string) (int, error) {
+	query, values, err := r.psql.
+		Select("COUNT(1)").
+		From(database.UsersTable).
+		Where(sq.Eq{"team_name": teamName}).ToSql()
+	if err != nil {
+		return -1, err
+	}
+	var isExist int
+	err = tx.QueryRow(ctx, query, values...).Scan(&isExist)
+
+	return isExist, err
 }
 
 func (r *TeamRepo) isTeamMemberExistTx(ctx context.Context, tx pgx.Tx, userId string) (int, error) {

@@ -8,9 +8,9 @@ import (
 )
 
 type HandlerInterface interface {
-	PostPullRequestCreate(w http.ResponseWriter, r *http.Request)
-	PostPullRequestMerge(w http.ResponseWriter, r *http.Request)
-	PostPullRequestReassign(w http.ResponseWriter, r *http.Request)
+	PullRequestCreate(w http.ResponseWriter, r *http.Request)
+	PullRequestMerge(w http.ResponseWriter, r *http.Request)
+	PullRequestReassign(w http.ResponseWriter, r *http.Request)
 	PostTeamAdd(w http.ResponseWriter, r *http.Request)
 	GetTeam(w http.ResponseWriter, r *http.Request)
 	GetUsersGetReview(w http.ResponseWriter, r *http.Request)
@@ -37,9 +37,9 @@ func NewRouter(h HandlerInterface) chi.Router {
 
 	r.Route("/api/v0", func(r chi.Router) {
 		r.Route("/pullRequest", func(r chi.Router) {
-			r.Post("/create", h.PostPullRequestCreate)
-			r.Post("/merge", h.PostPullRequestMerge)
-			r.Post("/reassign", h.PostPullRequestReassign)
+			r.Post("/create", h.PullRequestCreate)
+			r.Post("/merge", h.PullRequestMerge)
+			r.Post("/reassign", h.PullRequestReassign)
 		})
 
 		r.Route("/team", func(r chi.Router) {

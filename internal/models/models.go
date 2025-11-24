@@ -1,6 +1,10 @@
 package models
 
-import "github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
+import (
+	"time"
+
+	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
+)
 
 type ResponsePRsWhereUserIsReviewer struct {
 	User_id      string                 `json:"user_id"`
@@ -19,7 +23,7 @@ type User struct {
 	IsActive bool
 }
 
-type GetTeamGetParams struct {
+type GetTeamParams struct {
 	TeamName string
 }
 
@@ -33,3 +37,38 @@ type TeamMember struct {
 	Username string
 	IsActive bool
 }
+
+type PullRequest struct {
+	PullRequestId     string            `db:"id"`
+	AuthorId          string            `db:"author_id"`
+	PullRequestName   string            `db:"name"`
+	Status            PullRequestStatus `db:"status"`
+	AssignedReviewers []string
+	CreatedAt         *time.Time
+	MergedAt          *time.Time
+}
+type PullRequestShort struct {
+	AuthorId        string
+	PullRequestId   string
+	PullRequestName string
+	Status          PullRequestStatus
+}
+type PullRequestStatus string
+
+type PullRequestCreate struct {
+	AuthorId        string
+	PullRequestId   string
+	PullRequestName string
+}
+type PullRequestMerge struct {
+	PullRequestId string
+}
+type PullRequestReassign struct {
+	OldUserId     string
+	PullRequestId string
+}
+
+const (
+	PullRequestStatusMERGED PullRequestStatus = "MERGED"
+	PullRequestStatusOPEN   PullRequestStatus = "OPEN"
+)
