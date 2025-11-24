@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -12,8 +13,8 @@ import (
 )
 
 type UserServiceInterface interface {
-	GetPRsWhereUserIsReviewer(userId string) (models.ResponsePRsWhereUserIsReviewer, error)
-	PostUserSetIsActive(user *models.PostUserSetIsActive) (*models.ResponseUser, *api.ErrorResponse)
+	GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.ResponsePRsWhereUserIsReviewer, error)
+	PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, error)
 }
 
 type UserHandler struct {
@@ -32,14 +33,14 @@ func (h *UserHandler) GetUsersGetReview(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response, err := h.service.GetPRsWhereUserIsReviewer(user.UserId)
+	response, err := h.service.GetPRsWhereUserIsReviewer(r.Context(), user.UserId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		slog.Error(fmt.Sprintf("Error in server process: %s", err.Error()))
 		return
 	}
 
-	render.JSON(w, r, response)
+	render.JSON(w, r, *response)
 }
 func (h *UserHandler) PostUserSetIsActive(w http.ResponseWriter, r *http.Request) {
 	var user api.PostUserSetIsActive
@@ -49,9 +50,10 @@ func (h *UserHandler) PostUserSetIsActive(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	response, err := h.service.PostUserSetIsActive(models.ConvertToPostUserSetIsActive(user))
-	if err != nil && err.Error.Code == api.NOTFOUND {
-		http.Error(w, err.Error.Message, http.StatusNotFound)
+	response, err := h.service.PostUserSetIsActive(r.Context(), models.ConvertToPostUserSetIsActive(&user))
+	if err != nil { //&& err.Error.Code == api.NOTFOUND {
+		// http.Error(w, err.Error.Message, http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -12,23 +12,24 @@ type PostUserSetIsActive struct {
 	IsActive bool
 }
 
-type ResponseUser struct {
-	UserId   string `json:"user_id"`
-	Username string `json:"username"`
-	TeamName string `json:"team_name"`
-	IsActive bool   `json:"is_active"`
+type User struct {
+	UserId   string
+	Username string
+	TeamName string
+	IsActive bool
 }
 
-func ConvertToPostUserSetIsActive(user api.PostUserSetIsActive) *PostUserSetIsActive {
-	return &PostUserSetIsActive{
-		UserId:   user.UserId,
-		IsActive: user.IsActive,
-	}
+type GetTeamGetParams struct {
+	TeamName string
 }
 
-func ConvertToResponseUser(user PostUserSetIsActive) *ResponseUser {
-	return &ResponseUser{
-		UserId:   user.UserId,
-		IsActive: user.IsActive,
-	}
+type Team struct {
+	Members  []TeamMember
+	TeamName string
+}
+
+type TeamMember struct {
+	UserId   string
+	Username string
+	IsActive bool
 }

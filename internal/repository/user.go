@@ -44,7 +44,7 @@ func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string)
 	return &models.ResponsePRsWhereUserIsReviewer{User_id: userId, PullRequests: pullRequestFromRows}, nil
 }
 
-func (r *UserRepo) PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.ResponseUser, error) { // error -> api.ErrorResponse
+func (r *UserRepo) PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, error) { // error -> api.ErrorResponse
 	query, values, err := r.psql.
 		Update(database.UsersTable).
 		Set("is_active", user.IsActive).
@@ -54,7 +54,7 @@ func (r *UserRepo) PostUserSetIsActive(ctx context.Context, user *models.PostUse
 		return nil, err
 	}
 
-	userResponse := models.ConvertToResponseUser(*user)
+	userResponse := models.ConvertToUser(user)
 	r.db.QueryRow(ctx, query, values...).Scan(&userResponse.Username, &userResponse.TeamName)
 
 	return userResponse, nil
