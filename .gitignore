@@ -1,4 +1,1 @@
-*.env
-!*.example.*
-secrets/
 postgres-data/
