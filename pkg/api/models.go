@@ -14,6 +14,7 @@ type PostUserSetIsActive struct {
 
 // Error
 const (
+	SERVERERROR ErrorResponseErrorCode = "SERVER_ERROR"
 	NOCANDIDATE ErrorResponseErrorCode = "NO_CANDIDATE"
 	NOTASSIGNED ErrorResponseErrorCode = "NOT_ASSIGNED"
 	NOTFOUND    ErrorResponseErrorCode = "NOT_FOUND"

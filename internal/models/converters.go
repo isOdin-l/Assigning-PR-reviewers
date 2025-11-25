@@ -207,3 +207,15 @@ func ConvertToStringReviewer(reviewersId *[]ReviewerId) *[]string {
 	}
 	return &result
 }
+
+func ConvertToApiErrorResponse(err *ErrorResponse) *api.ErrorResponse {
+	return &api.ErrorResponse{
+		Error: struct {
+			Code    api.ErrorResponseErrorCode "json:\"code\""
+			Message string                     "json:\"message\""
+		}{
+			Code:    err.Code,
+			Message: err.Message,
+		},
+	}
+}

@@ -29,7 +29,7 @@ func (r *TeamRepo) CreateTeam(ctx context.Context, team *models.Team) error {
 	isExist, err := r.isTeamExist(ctx, tx, team.TeamName)
 	if err != nil {
 		return err
-	} else if isExist == 1 {
+	} else if isExist != 0 {
 		return errors.New("team already exists")
 	}
 

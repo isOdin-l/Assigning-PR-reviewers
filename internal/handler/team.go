@@ -6,15 +6,15 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/go-chi/render"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
 	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
 	"github.com/isOdin-l/Assigning-PR-reviewers/tool/chibind"
+	"github.com/isOdin-l/Assigning-PR-reviewers/tool/responser"
 )
 
 type TeamServiceInterface interface {
-	PostTeamAdd(ctx context.Context, team *models.Team) (*api.ResponseTeam, error)
-	GetTeam(ctx context.Context, team *models.GetTeamParams) (*api.ResponseTeam, error)
+	PostTeamAdd(ctx context.Context, team *models.Team) (*api.ResponseTeam, *models.ErrorResponse)
+	GetTeam(ctx context.Context, team *models.GetTeamParams) (*api.ResponseTeam, *models.ErrorResponse)
 }
 
 type TeamHandler struct {
@@ -28,45 +28,39 @@ func NewTeamHandler(service TeamServiceInterface) *TeamHandler {
 func (h *TeamHandler) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 	var team api.Team
 	if err := chibind.DefaultBind(r, &team); err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
-		slog.Error(fmt.Sprintf("Error while parsing data: %v", err.Error()))
+		responser.RenderError(w, r, http.StatusInternalServerError, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
+		slog.Error(fmt.Sprintf("Handler layer: %s", err.Error()))
 		return
 	}
 
 	response, err := h.service.PostTeamAdd(r.Context(), models.ConvertToTeam(&team))
-	// if err.Error.Code == models.TEAMEXISTS {
-	// 	http.Error(w, "Команда уже существует", http.StatusBadRequest)
-	// 	slog.Info(err.Error.Message)
-	// 	return
-	// }
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error(err.Error())
+	if err.Code == api.TEAMEXISTS {
+		responser.RenderError(w, r, http.StatusBadRequest, err)
+		slog.Error(fmt.Sprintf("Hadnler layer: %s", err.Message))
 		return
 	}
 
-	render.JSON(w, r, *response)
-
+	responser.RenderResponse(w, r, http.StatusCreated, *response)
 }
 func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
 	var team api.GetTeamParams
 	if err := chibind.DefaultBind(r, &team); err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
-		slog.Error(fmt.Sprintf("Erorr while parsing data: %v", err.Error()))
+		responser.RenderError(w, r, http.StatusInternalServerError, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
+		slog.Error(fmt.Sprintf("Handler layer: %s", err.Error()))
 		return
 	}
 
 	response, err := h.service.GetTeam(r.Context(), models.ConvertToGetTeamParams(&team))
-	// if err.Error.Code == models.NOTFOUND {
-	// 	http.Error(w, err.Error.Message, http.StatusNotFound)
-	// 	slog.Info(err.Error.Message)
-	// 	return
-	// }
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		slog.Error(err.Error())
+	switch err.Code {
+	case api.NOTFOUND:
+		responser.RenderError(w, r, http.StatusNotFound, err)
+		slog.Info(fmt.Sprintf("Handler layer: %s", err.Message))
+		return
+	case api.SERVERERROR:
+		responser.RenderError(w, r, http.StatusInternalServerError, err)
+		slog.Error(fmt.Sprintf("Handler layer: %s", err.Message))
 		return
 	}
 
-	render.JSON(w, r, *response)
+	responser.RenderResponse(w, r, http.StatusOK, *response)
 }

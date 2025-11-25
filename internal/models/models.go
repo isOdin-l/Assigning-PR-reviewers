@@ -2,7 +2,14 @@ package models
 
 import (
 	"time"
+
+	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
 )
+
+type ErrorResponse struct {
+	Code    api.ErrorResponseErrorCode
+	Message string
+}
 
 type GetTeamParams struct {
 	TeamName string

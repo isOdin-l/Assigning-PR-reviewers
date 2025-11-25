@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE users (
     id TEXT PRIMARY KEY,
     team_name TEXT NOT NULL,
-    user_name TEXT UNIQUE NOT NULL,
+    user_name TEXT NOT NULL,
     is_active BOOLEAN NOT NULL
 );
 

@@ -50,7 +50,7 @@ func (r *PullRequestRepo) PullRequestCreate(ctx context.Context, pullRequest *mo
 	if err != nil {
 		tx.Rollback(ctx)
 		return nil, err
-	} else if isExist == 1 {
+	} else if isExist != 0 {
 		tx.Rollback(ctx)
 		return nil, errors.New("author/team already exist")
 	}
