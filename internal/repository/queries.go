@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/database"
-	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
 )
 
 // Users
@@ -13,7 +12,7 @@ func getColumnsUserIsReviewer() []string {
 }
 
 func getJoinUserIsReviewer() string {
-	return fmt.Sprintf("%s USING (pr_id)", database.PrReviewsTable)
+	return fmt.Sprintf("%s ON id = pr_id", database.PrReviewsTable)
 }
 
 func getUpdateUserIsActiveSuffix() string {
@@ -32,10 +31,6 @@ func getInsertColumnsTeamMember() []string {
 // PullRequest
 func getInsertColumnsPr() []string {
 	return []string{"id", "author_id", "name"}
-}
-
-func getInsertValuesPr(pullRequest *models.PullRequestCreate) []string {
-	return []string{pullRequest.PullRequestId, pullRequest.AuthorId, pullRequest.PullRequestName}
 }
 
 func getInsertColumnsPrReviewer() []string {

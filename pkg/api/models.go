@@ -72,6 +72,13 @@ type PullRequestReassign struct {
 
 // === Response Api Models ===
 
+type ResponseTeam struct {
+	Team struct {
+		Members  []TeamMember `json:"members"`
+		TeamName string       `json:"team_name"`
+	} `json:"team"`
+}
+
 type ResponsePullRequestCreate struct {
 	PR struct {
 		PullRequestId     string            `json:"pull_request_id"`

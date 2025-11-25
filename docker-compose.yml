@@ -9,6 +9,7 @@ services:
       - ./configs/postgres.env
     volumes:
       - ./init/schema/001.init.up.sql:/docker-entrypoint-initdb.d/001.init.up.sql
+      - ./postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $(cat /run/secrets/db_user) -d $(cat /run/secrets/db_name)"]
       interval: 5s

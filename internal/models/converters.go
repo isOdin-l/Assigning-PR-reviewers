@@ -135,3 +135,31 @@ func ConvertToApiPullRequestReassign(pullRequest *PullRequest, replacedByUserId 
 		ReplacedByUserId: replacedByUserId,
 	}
 }
+
+func ConvertToApiResponseTeam(team *Team) *api.ResponseTeam {
+	return &api.ResponseTeam{
+		Team: struct {
+			Members  []api.TeamMember "json:\"members\""
+			TeamName string           "json:\"team_name\""
+		}{
+			TeamName: team.TeamName,
+			Members:  *convertToApiTeamMember(team.Members),
+		},
+	}
+}
+
+func ConvertToStringUser(reviewersId *[]UserId) *[]string {
+	result := make([]string, 0)
+	for _, v := range *reviewersId {
+		result = append(result, v.UserId)
+	}
+	return &result
+}
+
+func ConvertToStringReviewer(reviewersId *[]ReviewerId) *[]string {
+	result := make([]string, 0)
+	for _, v := range *reviewersId {
+		result = append(result, v.ReviewerId)
+	}
+	return &result
+}

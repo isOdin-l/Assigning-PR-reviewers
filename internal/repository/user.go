@@ -6,7 +6,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/database"
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
-	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -24,7 +23,7 @@ func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string)
 	query, args, err := r.psql.
 		Select(getColumnsUserIsReviewer()...).
 		From(database.PrTable).
-		Join(getJoinUserIsReviewer()).
+		InnerJoin(getJoinUserIsReviewer()).
 		Where(sq.Eq{"reviewer_id": userId}).ToSql()
 
 	if err != nil {
@@ -36,11 +35,10 @@ func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string)
 		return nil, err
 	}
 
-	pullRequestFromRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[api.PullRequestShort])
+	pullRequestFromRows, err := pgx.CollectRows(rows, pgx.RowToStructByName[models.PullRequestShort])
 	if err != nil {
 		return nil, err
 	} // проверить - мб ошибка будет при пустом pullrequest, тогда надо задавать pullrequest как пустой массив
-
 	return &models.ResponsePRsWhereUserIsReviewer{User_id: userId, PullRequests: pullRequestFromRows}, nil
 }
 

@@ -13,8 +13,8 @@ import (
 )
 
 type TeamServiceInterface interface {
-	PostTeamAdd(ctx context.Context, team *models.Team) (*models.Team, error)
-	GetTeam(ctx context.Context, team *models.GetTeamParams) (*models.Team, error)
+	PostTeamAdd(ctx context.Context, team *models.Team) (*api.ResponseTeam, error)
+	GetTeam(ctx context.Context, team *models.GetTeamParams) (*api.ResponseTeam, error)
 }
 
 type TeamHandler struct {
@@ -45,7 +45,7 @@ func (h *TeamHandler) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, *models.ConvertToApiTeam(response)) // TODO: Change to without converter - just render.JSON(w,r, team) & delete answer from server
+	render.JSON(w, r, *response)
 
 }
 func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
@@ -68,5 +68,5 @@ func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, *models.ConvertToApiTeam(response))
+	render.JSON(w, r, *response)
 }

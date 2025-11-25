@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
+	"github.com/isOdin-l/Assigning-PR-reviewers/pkg/api"
 )
 
 type TeamRepoInterface interface {
@@ -19,15 +20,19 @@ func NewTeamService(repo TeamRepoInterface) *TeamService {
 	return &TeamService{repo: repo}
 }
 
-func (s *TeamService) PostTeamAdd(ctx context.Context, team *models.Team) (*models.Team, error) {
+func (s *TeamService) PostTeamAdd(ctx context.Context, team *models.Team) (*api.ResponseTeam, error) {
 	// Проверка на существование команды и создание команды
 	err := s.repo.CreateTeam(ctx, team)
 	if err != nil {
 		return nil, err
 	}
 
-	return team, nil
+	return models.ConvertToApiResponseTeam(team), nil
 }
-func (s *TeamService) GetTeam(ctx context.Context, team *models.GetTeamParams) (*models.Team, error) {
-	return s.repo.GetTeam(ctx, team.TeamName)
+func (s *TeamService) GetTeam(ctx context.Context, team *models.GetTeamParams) (*api.ResponseTeam, error) {
+	response, err := s.repo.GetTeam(ctx, team.TeamName)
+	if err != nil {
+		return nil, err
+	}
+	return models.ConvertToApiResponseTeam(response), nil
 }
