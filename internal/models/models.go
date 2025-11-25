@@ -11,6 +11,20 @@ type ErrorResponse struct {
 	Message string
 }
 
+func InternalError(err error) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    api.SERVERERROR,
+		Message: err.Error(),
+	}
+}
+
+func ErrCreate(code api.ErrorResponseErrorCode, message string) *ErrorResponse {
+	return &ErrorResponse{
+		Code:    code,
+		Message: message,
+	}
+}
+
 type GetTeamParams struct {
 	TeamName string
 }

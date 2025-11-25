@@ -8,8 +8,8 @@ import (
 )
 
 type UserRepoInterface interface {
-	GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.PRsWhereUserIsReviewer, error)
-	PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, error)
+	GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.PRsWhereUserIsReviewer, *models.ErrorResponse)
+	PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, *models.ErrorResponse)
 }
 
 type UserService struct {
@@ -20,7 +20,7 @@ func NewUserService(repo UserRepoInterface) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (s *UserService) GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*api.ResponseGetPRsWhereUserIsReviewer, error) {
+func (s *UserService) GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*api.ResponseGetPRsWhereUserIsReviewer, *models.ErrorResponse) {
 	response, err := s.repo.GetPRsWhereUserIsReviewer(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (s *UserService) GetPRsWhereUserIsReviewer(ctx context.Context, userId stri
 	return models.ConvertToApiResponseGetPRsWhereUserIsReviewer(response), nil
 }
 
-func (s *UserService) PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*api.ResponseSetUserActive, error) {
+func (s *UserService) PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*api.ResponseSetUserActive, *models.ErrorResponse) {
 	response, err := s.repo.PostUserSetIsActive(ctx, user)
 	if err != nil {
 		return nil, err

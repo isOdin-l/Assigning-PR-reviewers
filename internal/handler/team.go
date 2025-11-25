@@ -2,8 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
 	"net/http"
 
 	"github.com/isOdin-l/Assigning-PR-reviewers/internal/models"
@@ -28,15 +26,13 @@ func NewTeamHandler(service TeamServiceInterface) *TeamHandler {
 func (h *TeamHandler) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 	var team api.Team
 	if err := chibind.DefaultBind(r, &team); err != nil {
-		responser.RenderError(w, r, http.StatusInternalServerError, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
-		slog.Error(fmt.Sprintf("Handler layer: %s", err.Error()))
+		responser.HandleError(w, r, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
 		return
 	}
 
 	response, err := h.service.PostTeamAdd(r.Context(), models.ConvertToTeam(&team))
-	if err.Code == api.TEAMEXISTS {
-		responser.RenderError(w, r, http.StatusBadRequest, err)
-		slog.Error(fmt.Sprintf("Hadnler layer: %s", err.Message))
+	if err != nil {
+		responser.HandleError(w, r, err)
 		return
 	}
 
@@ -45,20 +41,13 @@ func (h *TeamHandler) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 func (h *TeamHandler) GetTeam(w http.ResponseWriter, r *http.Request) {
 	var team api.GetTeamParams
 	if err := chibind.DefaultBind(r, &team); err != nil {
-		responser.RenderError(w, r, http.StatusInternalServerError, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
-		slog.Error(fmt.Sprintf("Handler layer: %s", err.Error()))
+		responser.HandleError(w, r, &models.ErrorResponse{Code: api.SERVERERROR, Message: err.Error()})
 		return
 	}
 
 	response, err := h.service.GetTeam(r.Context(), models.ConvertToGetTeamParams(&team))
-	switch err.Code {
-	case api.NOTFOUND:
-		responser.RenderError(w, r, http.StatusNotFound, err)
-		slog.Info(fmt.Sprintf("Handler layer: %s", err.Message))
-		return
-	case api.SERVERERROR:
-		responser.RenderError(w, r, http.StatusInternalServerError, err)
-		slog.Error(fmt.Sprintf("Handler layer: %s", err.Message))
+	if err != nil {
+		responser.HandleError(w, r, err)
 		return
 	}
 
