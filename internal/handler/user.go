@@ -13,8 +13,8 @@ import (
 )
 
 type UserServiceInterface interface {
-	GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.ResponsePRsWhereUserIsReviewer, error)
-	PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, error)
+	GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*api.ResponseGetPRsWhereUserIsReviewer, error)
+	PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*api.ResponseSetUserActive, error)
 }
 
 type UserHandler struct {
@@ -57,5 +57,5 @@ func (h *UserHandler) PostUserSetIsActive(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	render.JSON(w, r, response)
+	render.JSON(w, r, *response)
 }

@@ -148,6 +148,50 @@ func ConvertToApiResponseTeam(team *Team) *api.ResponseTeam {
 	}
 }
 
+func ConvertToApiResponseSetUserActive(user *User) *api.ResponseSetUserActive {
+	return &api.ResponseSetUserActive{
+		User: struct {
+			UserId   string "json:\"user_id\""
+			UserName string "json:\"username\""
+			TeamName string "json:\"team_name\""
+			IsActive bool   "json:\"is_active\""
+		}{
+			UserId:   user.UserId,
+			UserName: user.Username,
+			TeamName: user.TeamName,
+			IsActive: user.IsActive,
+		},
+	}
+}
+
+func ConvertToApiResponseGetPRsWhereUserIsReviewer(userPrs *PRsWhereUserIsReviewer) *api.ResponseGetPRsWhereUserIsReviewer {
+	prs := make([]struct {
+		PullRequestId   string                "json:\"pull_request_id\""
+		PullRequestName string                "json:\"pull_request_name\""
+		AuthorId        string                "json:\"author_id\""
+		Status          api.PullRequestStatus "json:\"status\""
+	}, 0)
+
+	result := &api.ResponseGetPRsWhereUserIsReviewer{UserId: userPrs.User_id}
+
+	for _, pr := range userPrs.PullRequests {
+		prs = append(prs, struct {
+			PullRequestId   string                "json:\"pull_request_id\""
+			PullRequestName string                "json:\"pull_request_name\""
+			AuthorId        string                "json:\"author_id\""
+			Status          api.PullRequestStatus "json:\"status\""
+		}{
+			PullRequestId:   pr.PullRequestId,
+			PullRequestName: pr.PullRequestName,
+			AuthorId:        pr.AuthorId,
+			Status:          api.PullRequestStatus(pr.Status),
+		})
+	}
+	result.PR = prs
+
+	return result
+}
+
 func ConvertToStringUser(reviewersId *[]UserId) *[]string {
 	result := make([]string, 0)
 	for _, v := range *reviewersId {

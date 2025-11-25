@@ -4,23 +4,6 @@ import (
 	"time"
 )
 
-type ResponsePRsWhereUserIsReviewer struct {
-	User_id      string             `json:"user_id"`
-	PullRequests []PullRequestShort `json:"pr"`
-}
-
-type PostUserSetIsActive struct {
-	UserId   string
-	IsActive bool
-}
-
-type User struct {
-	UserId   string
-	Username string
-	TeamName string
-	IsActive bool
-}
-
 type GetTeamParams struct {
 	TeamName string
 }
@@ -36,6 +19,23 @@ type TeamMember struct {
 	IsActive bool   `db:"is_active"`
 }
 
+// User
+type User struct {
+	UserId   string
+	Username string
+	TeamName string
+	IsActive bool
+}
+type PRsWhereUserIsReviewer struct {
+	User_id      string             `json:"user_id"`
+	PullRequests []PullRequestShort `json:"pr"`
+}
+
+type PostUserSetIsActive struct {
+	UserId   string
+	IsActive bool
+}
+
 type ReviewerId struct {
 	ReviewerId string `db:"reviewer_id"`
 }
@@ -43,6 +43,14 @@ type ReviewerId struct {
 type UserId struct {
 	UserId string `db:"id"`
 }
+
+// PullRequest
+type PullRequestStatus string
+
+const (
+	PullRequestStatusMERGED PullRequestStatus = "MERGED"
+	PullRequestStatusOPEN   PullRequestStatus = "OPEN"
+)
 
 type PullRequest struct {
 	PullRequestId     string            `db:"id"`
@@ -59,7 +67,6 @@ type PullRequestShort struct {
 	PullRequestName string            `db:"name"`
 	Status          PullRequestStatus `db:"status"`
 }
-type PullRequestStatus string
 
 type PullRequestCreate struct {
 	AuthorId        string
@@ -73,8 +80,3 @@ type PullRequestReassign struct {
 	OldUserId     string
 	PullRequestId string
 }
-
-const (
-	PullRequestStatusMERGED PullRequestStatus = "MERGED"
-	PullRequestStatusOPEN   PullRequestStatus = "OPEN"
-)

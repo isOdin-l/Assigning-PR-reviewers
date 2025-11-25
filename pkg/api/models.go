@@ -79,6 +79,25 @@ type ResponseTeam struct {
 	} `json:"team"`
 }
 
+type ResponseSetUserActive struct {
+	User struct {
+		UserId   string `json:"user_id"`
+		UserName string `json:"username"`
+		TeamName string `json:"team_name"`
+		IsActive bool   `json:"is_active"`
+	} `json:"user"`
+}
+
+type ResponseGetPRsWhereUserIsReviewer struct {
+	UserId string `json:"user_id"`
+	PR     []struct {
+		PullRequestId   string            `json:"pull_request_id"`
+		PullRequestName string            `json:"pull_request_name"`
+		AuthorId        string            `json:"author_id"`
+		Status          PullRequestStatus `json:"status"`
+	} `json:"pull_requests"`
+}
+
 type ResponsePullRequestCreate struct {
 	PR struct {
 		PullRequestId     string            `json:"pull_request_id"`

@@ -19,7 +19,7 @@ func NewUserRepo(db *pgxpool.Pool) *UserRepo {
 	return &UserRepo{db: db, psql: sq.StatementBuilder.PlaceholderFormat(sq.Dollar)}
 }
 
-func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.ResponsePRsWhereUserIsReviewer, error) {
+func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string) (*models.PRsWhereUserIsReviewer, error) {
 	query, args, err := r.psql.
 		Select(getColumnsUserIsReviewer()...).
 		From(database.PrTable).
@@ -39,7 +39,7 @@ func (r *UserRepo) GetPRsWhereUserIsReviewer(ctx context.Context, userId string)
 	if err != nil {
 		return nil, err
 	} // проверить - мб ошибка будет при пустом pullrequest, тогда надо задавать pullrequest как пустой массив
-	return &models.ResponsePRsWhereUserIsReviewer{User_id: userId, PullRequests: pullRequestFromRows}, nil
+	return &models.PRsWhereUserIsReviewer{User_id: userId, PullRequests: pullRequestFromRows}, nil
 }
 
 func (r *UserRepo) PostUserSetIsActive(ctx context.Context, user *models.PostUserSetIsActive) (*models.User, error) { // error -> api.ErrorResponse
